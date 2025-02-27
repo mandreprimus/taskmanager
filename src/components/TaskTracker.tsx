@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface Task {
-  id: number;
-  name: string;
-  status: string;
-  dueDate?: string;
-  notes?: string;
-  completedDate?: string;
-}
+import { Task } from '../taskStore';
 
 export default function TaskTracker() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -30,19 +22,31 @@ export default function TaskTracker() {
           name: "Complete task manager project", 
           status: "Priority", 
           dueDate: new Date().toISOString(),
-          notes: "First step is getting the basic version working"
+          notes: "First step is getting the basic version working",
+          created: new Date().toISOString(),
+          due: new Date().toISOString(),
+          completedDate: null,
+          subtasks: []
         },
         { 
           id: 2, 
           name: "Add more features later", 
           status: "Active", 
-          notes: "Consider adding Google Calendar integration"
+          notes: "Consider adding Google Calendar integration",
+          created: new Date().toISOString(),
+          due: null,
+          completedDate: null,
+          subtasks: []
         },
         { 
           id: 3, 
           name: "Set up GitHub repo", 
           status: "Complete", 
-          completedDate: new Date().toISOString() 
+          completedDate: new Date().toISOString(),
+          created: new Date().toISOString(),
+          due: null,
+          notes: "",
+          subtasks: []
         }
       ];
       setTasks(exampleTasks);
@@ -77,8 +81,11 @@ export default function TaskTracker() {
       id: getNextId(),
       name: taskName,
       status: taskStatus,
-      dueDate: taskDueDate ? new Date(taskDueDate).toISOString() : undefined,
-      notes: taskNotes || undefined
+      due: taskDueDate ? new Date(taskDueDate).toISOString() : null,
+      notes: taskNotes || "",
+      created: new Date().toISOString(),
+      completedDate: null,
+      subtasks: []
     };
     
     setTasks([...tasks, newTask]);
@@ -96,7 +103,7 @@ export default function TaskTracker() {
         return {
           ...task,
           status: isComplete ? 'Active' : 'Complete',
-          completedDate: isComplete ? undefined : new Date().toISOString()
+          completedDate: isComplete ? null : new Date().toISOString()
         };
       }
       return task;
@@ -109,7 +116,7 @@ export default function TaskTracker() {
   };
   
   // Format date for display
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return '';
     
     const date = new Date(dateString);
@@ -225,7 +232,7 @@ export default function TaskTracker() {
                 <div className="task-name">{task.name}</div>
                 <div className="task-meta">
                   #{task.id} | Status: {task.status}
-                  {task.dueDate && ` | Due: ${formatDate(task.dueDate)}`}
+                  {task.due && ` | Due: ${formatDate(task.due)}`}
                   {task.completedDate && ` | Completed: ${formatDate(task.completedDate)}`}
                 </div>
                 {task.notes && <div className="task-notes">{task.notes}</div>}

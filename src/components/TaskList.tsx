@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
-import { useTaskStore } from './taskStore';
+import { useState } from 'react';
+import { useTaskStore, Task } from '../taskStore';
 
-const TaskList = ({ tasks, showFilters = false, sortBy = 'id', sortDirection = 'asc' }) => {
+interface TaskListProps {
+  tasks: Task[];
+  showFilters?: boolean;
+  sortBy?: keyof Task;
+  sortDirection?: 'asc' | 'desc';
+}
+
+const TaskList = ({ 
+  tasks, 
+  showFilters = false, 
+  sortBy = 'id', 
+  sortDirection = 'asc' 
+}: TaskListProps) => {
   const { updateTask } = useTaskStore();
   const [filter, setFilter] = useState('all');
-  const [editingTask, setEditingTask] = useState(null);
   
   const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;
@@ -18,8 +29,8 @@ const TaskList = ({ tasks, showFilters = false, sortBy = 'id', sortDirection = '
     
     // Handle date values
     if (sortBy === 'due' || sortBy === 'completedDate' || sortBy === 'created') {
-      valueA = valueA ? new Date(valueA).getTime() : 0;
-      valueB = valueB ? new Date(valueB).getTime() : 0;
+      valueA = valueA ? new Date(valueA as string).getTime() : 0;
+      valueB = valueB ? new Date(valueB as string).getTime() : 0;
     }
     
     if (sortDirection === 'asc') {
@@ -29,8 +40,8 @@ const TaskList = ({ tasks, showFilters = false, sortBy = 'id', sortDirection = '
     }
   });
   
-  const handleStatusChange = (id, newStatus) => {
-    const updates = { status: newStatus };
+  const handleStatusChange = (id: number, newStatus: string) => {
+    const updates: Partial<Task> = { status: newStatus };
     
     // Add completedDate if task is being marked complete
     if (newStatus === 'Complete') {

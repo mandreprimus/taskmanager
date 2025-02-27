@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import { useTaskStore } from './taskStore';
+import { useState } from 'react';
+import { useTaskStore, Task } from '../taskStore';
 
-const TaskForm = ({ onTaskAdded, editTask }) => {
+interface TaskFormProps {
+  onTaskAdded?: () => void;
+  editTask?: Task;
+}
+
+const TaskForm = ({ onTaskAdded, editTask }: TaskFormProps) => {
   const { addTask, updateTask } = useTaskStore();
   
   const [formData, setFormData] = useState({
@@ -11,12 +16,12 @@ const TaskForm = ({ onTaskAdded, editTask }) => {
     notes: editTask ? editTask.notes : '',
   });
   
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
@@ -104,7 +109,7 @@ const TaskForm = ({ onTaskAdded, editTask }) => {
           name="notes"
           value={formData.notes}
           onChange={handleChange}
-          rows="3"
+          rows={3}
         ></textarea>
       </div>
       

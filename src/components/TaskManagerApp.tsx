@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useTaskStore } from './taskStore';
+import { useState } from 'react';
+import { useTaskStore } from '../taskStore';
 import TaskImporter from './TaskImporter';
 import TaskList from './TaskList';
 import TaskForm from './TaskForm';
@@ -16,7 +16,7 @@ const TaskManagerApp = () => {
   
   const taskCounts = getTaskCounts();
   
-  const handleTasksImported = (importedTasks) => {
+  const handleTasksImported = (importedTasks: any[]) => {
     const result = importTasks(importedTasks);
     console.log('Import result:', result);
     
@@ -27,7 +27,7 @@ const TaskManagerApp = () => {
   
   return (
     <div className="container">
-      <h1>Task Manager</h1>
+      <h2>Task Manager</h2>
       
       <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>

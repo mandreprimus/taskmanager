@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import TaskTracker from './components/TaskTracker'
 import ClaudeChat from './components/ClaudeChat'
+import TaskManagerApp from './components/TaskManagerApp'
 
 function App() {
   const [activeTab, setActiveTab] = useState('tasks');
@@ -15,7 +16,13 @@ function App() {
             className={activeTab === 'tasks' ? 'active' : ''} 
             onClick={() => setActiveTab('tasks')}
           >
-            Tasks
+            Task Tracker
+          </button>
+          <button 
+            className={activeTab === 'manager' ? 'active' : ''} 
+            onClick={() => setActiveTab('manager')}
+          >
+            Task Manager
           </button>
           <button 
             className={activeTab === 'claude' ? 'active' : ''} 
@@ -27,6 +34,7 @@ function App() {
       </header>
       <main>
         {activeTab === 'tasks' && <TaskTracker />}
+        {activeTab === 'manager' && <TaskManagerApp />}
         {activeTab === 'claude' && <ClaudeChat />}
       </main>
     </div>

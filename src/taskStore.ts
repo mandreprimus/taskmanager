@@ -1,7 +1,49 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, PersistOptions } from 'zustand/middleware';
 
-export const useTaskStore = create(
+export interface Task {
+  id: number;
+  name: string;
+  status: string;
+  created: string;
+  due: string | null;
+  completedDate: string | null;
+  notes: string;
+  subtasks: Task[];
+}
+
+interface TaskStore {
+  tasks: Task[];
+  nextId: number;
+  
+  addTask: (task: Partial<Task>) => number | false;
+  updateTask: (id: number, updates: Partial<Task>) => void;
+  removeTask: (id: number) => void;
+  importTasks: (tasksToImport: any[]) => { 
+    added: number; 
+    conflicts: number; 
+    skipped: number 
+  };
+  getTasksByStatus: (status?: string) => Task[];
+  getTaskCounts: () => {
+    all: number;
+    active: number;
+    completed: number;
+    urgent: number;
+    priority: number;
+  };
+  clearAllTasks: () => void;
+  getHighestTaskId: () => number;
+}
+
+type TaskStorePersist = PersistOptions<TaskStore, TaskStore>;
+
+const persistOptions: TaskStorePersist = {
+  name: 'task-management-store',
+  version: 1,
+};
+
+export const useTaskStore = create<TaskStore>()(
   persist(
     (set, get) => ({
       tasks: [],
@@ -15,7 +57,7 @@ export const useTaskStore = create(
           return false;
         }
         
-        const newTask = {
+        const newTask: Task = {
           id: task.id || nextId,
           name: task.name,
           status: task.status || 'New',
@@ -135,9 +177,6 @@ export const useTaskStore = create(
         return Math.max(...tasks.map(t => t.id));
       }
     }),
-    {
-      name: 'task-management-store',
-      version: 1,
-    }
+    persistOptions
   )
 );

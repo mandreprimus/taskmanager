@@ -1,13 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-
-interface Task {
-  id: number;
-  name: string;
-  status: string;
-  dueDate?: string;
-  notes?: string;
-  completedDate?: string;
-}
+import { Task } from '../taskStore';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -70,8 +62,8 @@ export default function ClaudeChat() {
     tasks.forEach((task: Task) => {
       context += `- #${task.id}: ${task.name} (${task.status})`;
       
-      if (task.dueDate) {
-        context += ` | Due: ${new Date(task.dueDate).toLocaleDateString()}`;
+      if (task.due) {
+        context += ` | Due: ${new Date(task.due).toLocaleDateString()}`;
       }
       
       if (task.completedDate) {

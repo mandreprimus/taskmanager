@@ -1,29 +1,40 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Task } from '../taskStore';
 
-const TaskImporter = ({ onTasksImported }) => {
-  const [importMethod, setImportMethod] = useState('file');
-  const [fileContent, setFileContent] = useState(null);
+interface TaskImporterProps {
+  onTasksImported: (tasks: Partial<Task>[]) => void;
+}
+
+interface LogMessage {
+  message: string;
+  type: 'info' | 'warning' | 'error';
+  timestamp: Date;
+}
+
+const TaskImporter = ({ onTasksImported }: TaskImporterProps) => {
+  const [importMethod, setImportMethod] = useState<'file' | 'paste'>('file');
+  const [fileContent, setFileContent] = useState<string | null>(null);
   const [pastedCode, setPastedCode] = useState('');
-  const [extractedTasks, setExtractedTasks] = useState([]);
-  const [importStatus, setImportStatus] = useState('idle');
-  const [importLog, setImportLog] = useState([]);
+  const [extractedTasks, setExtractedTasks] = useState<Partial<Task>[]>([]);
+  const [importStatus, setImportStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [importLog, setImportLog] = useState<LogMessage[]>([]);
 
-  const logMessage = (message, type = 'info') => {
+  const logMessage = (message: string, type: 'info' | 'warning' | 'error' = 'info') => {
     setImportLog(prev => [...prev, { message, type, timestamp: new Date() }]);
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      setFileContent(e.target.result);
+      setFileContent(e.target?.result as string);
     };
     reader.readAsText(file);
   };
 
-  const parseTasksFromReactComponent = (code) => {
+  const parseTasksFromReactComponent = (code: string) => {
     setImportStatus('processing');
     logMessage('Starting task extraction...');
     
@@ -71,7 +82,7 @@ const TaskImporter = ({ onTasksImported }) => {
       setImportStatus('success');
       
       return validTasks;
-    } catch (error) {
+    } catch (error: any) {
       logMessage(`Error extracting tasks: ${error.message}`, 'error');
       setImportStatus('error');
       return [];
@@ -100,10 +111,11 @@ const TaskImporter = ({ onTasksImported }) => {
   const renderTaskSummary = () => {
     if (extractedTasks.length === 0) return null;
     
-    const highestId = Math.max(...extractedTasks.map(t => t.id));
+    const highestId = Math.max(...extractedTasks.map(t => t.id || 0));
     
-    const statusCounts = extractedTasks.reduce((acc, task) => {
-      acc[task.status] = (acc[task.status] || 0) + 1;
+    const statusCounts = extractedTasks.reduce((acc: Record<string, number>, task) => {
+      const status = task.status || 'Unknown';
+      acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {});
     
